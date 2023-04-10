@@ -185,26 +185,26 @@ export class Tx {
           assetsToValue(_assets)
         );
 
-        if (outputData.hash) {
+        if ((outputData as OutputData).hash) {
           output.set_datum(
-            C.Datum.new_data_hash(C.DataHash.from_hex(outputData.hash))
+            C.Datum.new_data_hash(C.DataHash.from_hex((outputData as OutputData).hash!))
           );
-        } else if (outputData.asHash) {
+        } else if ((outputData as OutputData).asHash) {
           const plutusData = C.PlutusData.from_bytes(
-            fromHex(outputData.asHash)
+            fromHex((outputData as OutputData).asHash!)
           );
           output.set_datum(
             C.Datum.new_data_hash(C.hash_plutus_data(plutusData))
           );
           that.txBuilder.add_plutus_data(plutusData);
-        } else if (outputData.inline) {
+        } else if ((outputData as OutputData).inline) {
           const plutusData = C.PlutusData.from_bytes(
-            fromHex(outputData.inline)
+            fromHex((outputData as OutputData).inline!)
           );
           output.set_datum(C.Datum.new_data(C.Data.new(plutusData)));
         }
 
-        const script = outputData.scriptRef;
+        const script = (outputData as OutputData).scriptRef;
         if (script) {
           output.set_script_ref(toScriptRef(script));
         }
