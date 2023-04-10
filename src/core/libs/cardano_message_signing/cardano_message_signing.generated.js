@@ -1135,7 +1135,7 @@ export class COSEEncrypt {
    * @returns {Headers}
    */
   headers() {
-    const ret = wasm.coseencrypt0_headers(this.ptr);
+    const ret = wasm.coseencrypt_headers(this.ptr);
     return Headers.__wrap(ret);
   }
   /**
@@ -1144,7 +1144,7 @@ export class COSEEncrypt {
   ciphertext() {
     try {
       const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-      wasm.coseencrypt0_ciphertext(retptr, this.ptr);
+      wasm.coseencrypt_ciphertext(retptr, this.ptr);
       var r0 = getInt32Memory0()[retptr / 4 + 0];
       var r1 = getInt32Memory0()[retptr / 4 + 1];
       let v0;
@@ -1543,7 +1543,7 @@ export class COSERecipient {
    * @returns {Headers}
    */
   headers() {
-    const ret = wasm.coseencrypt0_headers(this.ptr);
+    const ret = wasm.coserecipient_headers(this.ptr);
     return Headers.__wrap(ret);
   }
   /**
@@ -1552,7 +1552,7 @@ export class COSERecipient {
   ciphertext() {
     try {
       const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-      wasm.coseencrypt0_ciphertext(retptr, this.ptr);
+      wasm.coserecipient_ciphertext(retptr, this.ptr);
       var r0 = getInt32Memory0()[retptr / 4 + 0];
       var r1 = getInt32Memory0()[retptr / 4 + 1];
       let v0;
@@ -1576,7 +1576,7 @@ export class COSERecipient {
       ? 0
       : passArray8ToWasm0(ciphertext, wasm.__wbindgen_malloc);
     var len0 = WASM_VECTOR_LEN;
-    const ret = wasm.coseencrypt0_new(headers.ptr, ptr0, len0);
+    const ret = wasm.coserecipient_new(headers.ptr, ptr0, len0);
     return COSERecipient.__wrap(ret);
   }
 }
@@ -1652,7 +1652,7 @@ export class COSERecipients {
    * @returns {number}
    */
   len() {
-    const ret = wasm.cborarray_len(this.ptr);
+    const ret = wasm.coserecipients_len(this.ptr);
     return ret >>> 0;
   }
   /**
@@ -1736,7 +1736,7 @@ export class COSESign {
    * @returns {Headers}
    */
   headers() {
-    const ret = wasm.coseencrypt0_headers(this.ptr);
+    const ret = wasm.cosesign_headers(this.ptr);
     return Headers.__wrap(ret);
   }
   /**
@@ -1745,7 +1745,7 @@ export class COSESign {
   payload() {
     try {
       const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-      wasm.coseencrypt0_ciphertext(retptr, this.ptr);
+      wasm.cosesign_payload(retptr, this.ptr);
       var r0 = getInt32Memory0()[retptr / 4 + 0];
       var r1 = getInt32Memory0()[retptr / 4 + 1];
       let v0;
@@ -1847,7 +1847,7 @@ export class COSESign1 {
    * @returns {Headers}
    */
   headers() {
-    const ret = wasm.coseencrypt0_headers(this.ptr);
+    const ret = wasm.cosesign1_headers(this.ptr);
     return Headers.__wrap(ret);
   }
   /**
@@ -1856,7 +1856,7 @@ export class COSESign1 {
   payload() {
     try {
       const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-      wasm.coseencrypt0_ciphertext(retptr, this.ptr);
+      wasm.cosesign1_payload(retptr, this.ptr);
       var r0 = getInt32Memory0()[retptr / 4 + 0];
       var r1 = getInt32Memory0()[retptr / 4 + 1];
       let v0;
@@ -2053,7 +2053,7 @@ export class COSESignBuilder {
   }
   /** */
   hash_payload() {
-    wasm.cosesign1builder_hash_payload(this.ptr);
+    wasm.cosesignbuilder_hash_payload(this.ptr);
   }
   /**
    * @param {Uint8Array} external_aad
@@ -2061,7 +2061,7 @@ export class COSESignBuilder {
   set_external_aad(external_aad) {
     const ptr0 = passArray8ToWasm0(external_aad, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    wasm.cosesign1builder_set_external_aad(this.ptr, ptr0, len0);
+    wasm.cosesignbuilder_set_external_aad(this.ptr, ptr0, len0);
   }
   /**
    * @returns {SigStructure}
@@ -2145,7 +2145,7 @@ export class COSESignature {
    * @returns {Headers}
    */
   headers() {
-    const ret = wasm.coseencrypt0_headers(this.ptr);
+    const ret = wasm.cosesignature_headers(this.ptr);
     return Headers.__wrap(ret);
   }
   /**
@@ -2242,14 +2242,14 @@ export class COSESignatures {
    * @returns {COSESignatures}
    */
   static new() {
-    const ret = wasm.coserecipients_new();
+    const ret = wasm.cosesignatures_new();
     return COSESignatures.__wrap(ret);
   }
   /**
    * @returns {number}
    */
   len() {
-    const ret = wasm.cborarray_len(this.ptr);
+    const ret = wasm.cosesignatures_len(this.ptr);
     return ret >>> 0;
   }
   /**
@@ -2549,7 +2549,7 @@ export class HeaderMap {
   set_init_vector(init_vector) {
     const ptr0 = passArray8ToWasm0(init_vector, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    wasm.cosekey_set_base_init_vector(this.ptr, ptr0, len0);
+    wasm.headermap_set_init_vector(this.ptr, ptr0, len0);
   }
   /**
    * @returns {Uint8Array | undefined}
@@ -2557,7 +2557,7 @@ export class HeaderMap {
   init_vector() {
     try {
       const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-      wasm.cosekey_base_init_vector(retptr, this.ptr);
+      wasm.headermap_init_vector(retptr, this.ptr);
       var r0 = getInt32Memory0()[retptr / 4 + 0];
       var r1 = getInt32Memory0()[retptr / 4 + 1];
       let v0;
@@ -3052,14 +3052,14 @@ export class Labels {
    * @returns {Labels}
    */
   static new() {
-    const ret = wasm.coserecipients_new();
+    const ret = wasm.labels_new();
     return Labels.__wrap(ret);
   }
   /**
    * @returns {number}
    */
   len() {
-    const ret = wasm.cborarray_len(this.ptr);
+    const ret = wasm.labels_len(this.ptr);
     return ret >>> 0;
   }
   /**

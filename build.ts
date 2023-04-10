@@ -1,4 +1,5 @@
 import { build, emptyDir } from "https://deno.land/x/dnt@0.30.0/mod.ts";
+import * as esbuild from "https://deno.land/x/esbuild@v0.14.45/mod.js";
 import packageInfo from "./package.json" assert { type: "json" };
 
 await emptyDir("./dist");
