@@ -228,7 +228,7 @@ export class Utils {
     return stakeCredentialOf(rewardAddress);
   }
 
-  getMinAdaForOutput(output: Core.TransactionOutput): BigInt {
+  getMinAdaForOutput(output: Core.TransactionOutput): bigint {
     const minAda = C.min_ada_required(
       output,
       C.BigNum.from_str(

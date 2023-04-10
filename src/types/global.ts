@@ -10,9 +10,9 @@ export type WalletApi = {
   signTx(tx: string, partialSign: boolean): Promise<string>;
   signData(address: string, payload: string): Promise<{ signature: string; key: string }>;
   submitTx(tx: string): Promise<string>;
-  getCollateral(): Promise<string[]>;
+  getCollateralCore(): Promise<string[]>;
   experimental: {
-    getCollateral(): Promise<string[]>;
+    getCollateralCore(): Promise<string[]>;
     on(eventName: string, callback: (...args: unknown[]) => void): void;
     off(eventName: string, callback: (...args: unknown[]) => void): void;
   };

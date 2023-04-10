@@ -178,7 +178,7 @@ export interface Wallet {
   address(): Promise<Address>;
   rewardAddress(): Promise<RewardAddress | null>;
   getUtxos(): Promise<UTxO[]>;
-  getCollateral(): Core.TransactionUnspentOutputs | undefined;
+  getCollateralCore(): Core.TransactionUnspentOutputs | undefined;
   getUtxosCore(): Promise<Core.TransactionUnspentOutputs>;
   getDelegation(): Promise<Delegation>;
   signTx(tx: Core.Transaction): Promise<Core.TransactionWitnessSet>;

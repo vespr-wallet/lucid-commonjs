@@ -38,11 +38,11 @@ import { SLOT_CONFIG_NETWORK } from "../plutus/time.ts";
 import { Data } from "../plutus/data.ts";
 import { TSchema } from "https://deno.land/x/typebox@0.25.13/src/typebox.ts";
 import { Emulator } from "../provider/emulator.ts";
-import { Credential } from "../types/types.ts";
+import { Credential, ProtocolParameters } from "../types/types.ts";
 
 export class Lucid {
   txBuilderConfig!: Core.TransactionBuilderConfig;
-  protocolParameters: any;
+  protocolParameters!: ProtocolParameters;
   wallet!: Wallet;
   provider!: Provider;
   network: Network = "Mainnet";

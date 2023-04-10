@@ -106,7 +106,7 @@ export class Tx {
   /**
    * All assets should be of the same policy id.
    * You can chain mintAssets functions together if you need to mint assets with different policy ids.
-   * If the plutus script doesn't need a redeemer, you still need to specifiy the empty redeemer.
+   * If the plutus script doesn't need a redeemer, you still need to specifiy the void redeemer.
    */
   mintAssets(assets: Assets, redeemer?: Redeemer): Tx {
     this.tasks.push((that) => {
@@ -116,7 +116,7 @@ export class Tx {
       units.forEach((unit) => {
         if (unit.slice(0, 56) !== policyId) {
           throw new Error(
-            "Only one Policy Id allowed. You can chain multiple mintAssets functions together if you need to mint assets with different Policy Ids."
+            "Only one policy id allowed. You can chain multiple mintAssets functions together if you need to mint assets with different policy ids."
           );
         }
         mintAssets.insert(
@@ -179,7 +179,7 @@ export class Tx {
           "Not allowed to set hash, asHash and inline at the same time."
         );
       }
-      const createOutput = (_assets) => {
+      const createOutput = (_assets: Assets) => {
         const output = C.TransactionOutput.new(
           addressFromWithNetworkCheck(address, that.lucid),
           assetsToValue(_assets)
@@ -492,6 +492,16 @@ export class Tx {
         C.BigNum.from_str(label.toString()),
         JSON.stringify(metadata),
         C.MetadataJsonSchema.BasicConversions
+      );
+    });
+    return this;
+  }
+
+  /** Explicitely set the network id in the transaction body. */
+  addNetworkId(id: number): Tx {
+    this.tasks.push((that) => {
+      that.txBuilder.set_network_id(
+        C.NetworkId.from_bytes(fromHex(id.toString(16).padStart(2, "0")))
       );
     });
     return this;
@@ -851,7 +861,7 @@ async function createPoolRegistration(
       poolOwners,
       relays,
       metadataHash
-        ? C.PoolMetadata.new(C.URL.new(poolParams.metadataUrl!), metadataHash)
+        ? C.PoolMetadata.new(C.Url.new(poolParams.metadataUrl!), metadataHash)
         : undefined
     )
   );
