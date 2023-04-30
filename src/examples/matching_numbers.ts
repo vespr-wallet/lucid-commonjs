@@ -1,4 +1,3 @@
-import { PlutusData } from 'utils/plutusData';
 import {
   Address,
   Blockfrost,
