@@ -1,7 +1,7 @@
 // @generated file from wasmbuild -- do not edit
 // deno-lint-ignore-file
 // deno-fmt-ignore-file
-// source-hash: b07ed2faeba2873a242d1dd43ca61e54c0dea790
+// source-hash: feeb9968db035bce728486ecc28b60007e003e45
 let wasm;
 
 const cachedTextDecoder = new TextDecoder("utf-8", {
@@ -511,6 +511,13 @@ function getUint32Memory0() {
     cachedUint32Memory0 = new Uint32Array(wasm.memory.buffer);
   }
   return cachedUint32Memory0;
+}
+
+function passArray32ToWasm0(arg, malloc) {
+  const ptr = malloc(arg.length * 4);
+  getUint32Memory0().set(arg, ptr / 4);
+  WASM_VECTOR_LEN = arg.length;
+  return ptr;
 }
 
 function getArrayU32FromWasm0(ptr, len) {
@@ -18186,17 +18193,22 @@ export class TransactionBuilder {
    * change_address is required here in order to determine the min ada requirement precisely
    * @param {TransactionUnspentOutputs} inputs
    * @param {Address} change_address
+   * @param {Uint32Array} weights
    */
-  add_inputs_from(inputs, change_address) {
+  add_inputs_from(inputs, change_address, weights) {
     try {
       const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
       _assertClass(inputs, TransactionUnspentOutputs);
       _assertClass(change_address, Address);
+      const ptr0 = passArray32ToWasm0(weights, wasm.__wbindgen_malloc);
+      const len0 = WASM_VECTOR_LEN;
       wasm.transactionbuilder_add_inputs_from(
         retptr,
         this.ptr,
         inputs.ptr,
         change_address.ptr,
+        ptr0,
+        len0,
       );
       var r0 = getInt32Memory0()[retptr / 4 + 0];
       var r1 = getInt32Memory0()[retptr / 4 + 1];
@@ -23183,7 +23195,7 @@ const imports = {
       const ret = wasm.memory;
       return addHeapObject(ret);
     },
-    __wbindgen_closure_wrapper5956: function (arg0, arg1, arg2) {
+    __wbindgen_closure_wrapper5957: function (arg0, arg1, arg2) {
       const ret = makeMutClosure(arg0, arg1, 194, __wbg_adapter_30);
       return addHeapObject(ret);
     },
