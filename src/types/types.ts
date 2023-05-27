@@ -4,13 +4,6 @@ type CostModel = Record<string, number>;
 
 export type CostModels = Record<PlutusVersion, CostModel>;
 
-export interface Configuration {
-  enableChangeSplitting: boolean;
-  changeNativeAssetChunkSize: number;
-  changeMinUtxo: string;
-  changeCollateral: string;
-}
-
 export type ProtocolParameters = {
   minFeeA: number;
   minFeeB: number;
@@ -169,7 +162,6 @@ export interface ExternalWallet {
   address: Address;
   utxos?: UTxO[];
   rewardAddress?: RewardAddress;
-  collateral?: UTxO[];
 }
 
 export type SignedMessage = { signature: string; key: string };
@@ -178,7 +170,6 @@ export interface Wallet {
   address(): Promise<Address>;
   rewardAddress(): Promise<RewardAddress | null>;
   getUtxos(): Promise<UTxO[]>;
-  getCollateralCore(): Core.TransactionUnspentOutputs | undefined;
   getUtxosCore(): Promise<Core.TransactionUnspentOutputs>;
   getDelegation(): Promise<Delegation>;
   signTx(tx: Core.Transaction): Promise<Core.TransactionWitnessSet>;

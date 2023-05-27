@@ -21,6 +21,7 @@ import {
   OutRef,
   Payload,
   PrivateKey,
+  ProtocolParameters,
   Provider,
   RewardAddress,
   SignedMessage,
@@ -40,7 +41,6 @@ import { Message } from "./message.ts";
 import { SLOT_CONFIG_NETWORK } from "../plutus/time.ts";
 import { Constr, Data } from "../plutus/data.ts";
 import { Emulator } from "../provider/emulator.ts";
-import { ProtocolParameters } from "../types/types.ts";
 
 export class Lucid {
   txBuilderConfig!: Core.TransactionBuilderConfig;
@@ -70,19 +70,19 @@ export class Lucid {
       const slotConfig = SLOT_CONFIG_NETWORK[lucid.network];
       lucid.txBuilderConfig = C.TransactionBuilderConfigBuilder.new()
         .coins_per_utxo_byte(
-          C.BigNum.from_str(protocolParameters.coinsPerUtxoByte.toString())
+          C.BigNum.from_str(protocolParameters.coinsPerUtxoByte.toString()),
         )
         .fee_algo(
           C.LinearFee.new(
             C.BigNum.from_str(protocolParameters.minFeeA.toString()),
-            C.BigNum.from_str(protocolParameters.minFeeB.toString())
-          )
+            C.BigNum.from_str(protocolParameters.minFeeB.toString()),
+          ),
         )
         .key_deposit(
-          C.BigNum.from_str(protocolParameters.keyDeposit.toString())
+          C.BigNum.from_str(protocolParameters.keyDeposit.toString()),
         )
         .pool_deposit(
-          C.BigNum.from_str(protocolParameters.poolDeposit.toString())
+          C.BigNum.from_str(protocolParameters.poolDeposit.toString()),
         )
         .max_tx_size(protocolParameters.maxTxSize)
         .max_value_size(protocolParameters.maxValSize)
@@ -91,19 +91,19 @@ export class Lucid {
         .max_tx_ex_units(
           C.ExUnits.new(
             C.BigNum.from_str(protocolParameters.maxTxExMem.toString()),
-            C.BigNum.from_str(protocolParameters.maxTxExSteps.toString())
-          )
+            C.BigNum.from_str(protocolParameters.maxTxExSteps.toString()),
+          ),
         )
         .ex_unit_prices(
           C.ExUnitPrices.from_float(
             protocolParameters.priceMem,
-            protocolParameters.priceStep
-          )
+            protocolParameters.priceStep,
+          ),
         )
         .slot_config(
           C.BigNum.from_str(slotConfig.zeroTime.toString()),
           C.BigNum.from_str(slotConfig.zeroSlot.toString()),
-          slotConfig.slotLength
+          slotConfig.slotLength,
         )
         .blockfrost(
           // We have Aiken now as native plutus core engine (primary), but we still support blockfrost (secondary) in case of bugs.
@@ -111,8 +111,8 @@ export class Lucid {
             // deno-lint-ignore no-explicit-any
             ((provider as any)?.url || "") + "/utils/txs/evaluate",
             // deno-lint-ignore no-explicit-any
-            (provider as any)?.projectId || ""
-          )
+            (provider as any)?.projectId || "",
+          ),
         )
         .costmdls(createCostModels(protocolParameters.costModels))
         .build();
@@ -154,7 +154,7 @@ export class Lucid {
   verifyMessage(
     address: Address | RewardAddress,
     payload: Payload,
-    signedMessage: SignedMessage
+    signedMessage: SignedMessage,
   ): boolean {
     const {
       paymentCredential,
@@ -177,7 +177,7 @@ export class Lucid {
 
   utxosAtWithUnit(
     addressOrCredential: Address | Credential,
-    unit: Unit
+    unit: Unit,
   ): Promise<UTxO[]> {
     return this.provider.getUtxosWithUnit(addressOrCredential, unit);
   }
@@ -238,23 +238,20 @@ export class Lucid {
       address: async (): Promise<Address> =>
         C.EnterpriseAddress.new(
           this.network === "Mainnet" ? 1 : 0,
-          C.StakeCredential.from_keyhash(pubKeyHash)
+          C.StakeCredential.from_keyhash(pubKeyHash),
         )
           .to_address()
           .to_bech32(undefined),
       // deno-lint-ignore require-await
       rewardAddress: async (): Promise<RewardAddress | null> => null,
-      getCollateralCore: (): Core.TransactionUnspentOutputs | undefined => {
-        return undefined;
-      },
       getUtxos: async (): Promise<UTxO[]> => {
         return await this.utxosAt(
-          paymentCredentialOf(await this.wallet.address())
+          paymentCredentialOf(await this.wallet.address()),
         );
       },
       getUtxosCore: async (): Promise<Core.TransactionUnspentOutputs> => {
         const utxos = await this.utxosAt(
-          paymentCredentialOf(await this.wallet.address())
+          paymentCredentialOf(await this.wallet.address()),
         );
         const coreUtxos = C.TransactionUnspentOutputs.new();
         utxos.forEach((utxo) => {
@@ -268,11 +265,11 @@ export class Lucid {
       },
       // deno-lint-ignore require-await
       signTx: async (
-        tx: Core.Transaction
+        tx: Core.Transaction,
       ): Promise<Core.TransactionWitnessSet> => {
         const witness = C.make_vkey_witness(
           C.hash_transaction(tx.body()),
-          priv
+          priv,
         );
         const txWitnessSetBuilder = C.TransactionWitnessSetBuilder.new();
         txWitnessSetBuilder.add_vkey(witness);
@@ -281,7 +278,7 @@ export class Lucid {
       // deno-lint-ignore require-await
       signMessage: async (
         address: Address | RewardAddress,
-        payload: Payload
+        payload: Payload,
       ): Promise<SignedMessage> => {
         const {
           paymentCredential,
@@ -316,26 +313,23 @@ export class Lucid {
     this.wallet = {
       address: async (): Promise<Address> =>
         C.Address.from_bytes(fromHex(await getAddressHex())).to_bech32(
-          undefined
+          undefined,
         ),
       rewardAddress: async (): Promise<RewardAddress | null> => {
         const [rewardAddressHex] = await api.getRewardAddresses();
         const rewardAddress = rewardAddressHex
           ? C.RewardAddress.from_address(
-              C.Address.from_bytes(fromHex(rewardAddressHex))
-            )!
-              .to_address()
-              .to_bech32(undefined)
+            C.Address.from_bytes(fromHex(rewardAddressHex)),
+          )!
+            .to_address()
+            .to_bech32(undefined)
           : null;
         return rewardAddress;
-      },
-      getCollateralCore: (): Core.TransactionUnspentOutputs | undefined => {
-        return undefined;
       },
       getUtxos: async (): Promise<UTxO[]> => {
         const utxos = ((await api.getUtxos()) || []).map((utxo) => {
           const parsedUtxo = C.TransactionUnspentOutput.from_bytes(
-            fromHex(utxo)
+            fromHex(utxo),
           );
           return coreToUtxo(parsedUtxo);
         });
@@ -356,14 +350,14 @@ export class Lucid {
           : { poolId: null, rewards: 0n };
       },
       signTx: async (
-        tx: Core.Transaction
+        tx: Core.Transaction,
       ): Promise<Core.TransactionWitnessSet> => {
         const witnessSet = await api.signTx(toHex(tx.to_bytes()), true);
         return C.TransactionWitnessSet.from_bytes(fromHex(witnessSet));
       },
       signMessage: async (
         address: Address | RewardAddress,
-        payload: Payload
+        payload: Payload,
       ): Promise<SignedMessage> => {
         const hexAddress = toHex(C.Address.from_bech32(address).to_bytes());
         return await api.signData(hexAddress, payload);
@@ -384,7 +378,6 @@ export class Lucid {
     address,
     utxos,
     rewardAddress,
-    collateral,
   }: ExternalWallet): Lucid {
     const addressDetails = this.utils.getAddressDetails(address);
     this.wallet = {
@@ -392,51 +385,39 @@ export class Lucid {
       address: async (): Promise<Address> => address,
       // deno-lint-ignore require-await
       rewardAddress: async (): Promise<RewardAddress | null> => {
-        const rewardAddr =
-          !rewardAddress && addressDetails.stakeCredential
-            ? (() => {
-                if (addressDetails.stakeCredential.type === "Key") {
-                  return C.RewardAddress.new(
-                    this.network === "Mainnet" ? 1 : 0,
-                    C.StakeCredential.from_keyhash(
-                      C.Ed25519KeyHash.from_hex(
-                        addressDetails.stakeCredential.hash
-                      )
-                    )
-                  )
-                    .to_address()
-                    .to_bech32(undefined);
-                }
-                return C.RewardAddress.new(
-                  this.network === "Mainnet" ? 1 : 0,
-                  C.StakeCredential.from_scripthash(
-                    C.ScriptHash.from_hex(addressDetails.stakeCredential.hash)
-                  )
-                )
-                  .to_address()
-                  .to_bech32(undefined);
-              })()
-            : rewardAddress;
+        const rewardAddr = !rewardAddress && addressDetails.stakeCredential
+          ? (() => {
+            if (addressDetails.stakeCredential.type === "Key") {
+              return C.RewardAddress.new(
+                this.network === "Mainnet" ? 1 : 0,
+                C.StakeCredential.from_keyhash(
+                  C.Ed25519KeyHash.from_hex(
+                    addressDetails.stakeCredential.hash,
+                  ),
+                ),
+              )
+                .to_address()
+                .to_bech32(undefined);
+            }
+            return C.RewardAddress.new(
+              this.network === "Mainnet" ? 1 : 0,
+              C.StakeCredential.from_scripthash(
+                C.ScriptHash.from_hex(addressDetails.stakeCredential.hash),
+              ),
+            )
+              .to_address()
+              .to_bech32(undefined);
+          })()
+          : rewardAddress;
         return rewardAddr || null;
-      },
-      getCollateralCore: (): Core.TransactionUnspentOutputs | undefined => {
-        if (!collateral || !collateral.length) {
-          return undefined;
-        }
-
-        const coreUtxos = C.TransactionUnspentOutputs.new();
-        collateral.forEach((utxo) => coreUtxos.add(utxoToCore(utxo)));
-        return coreUtxos;
       },
       getUtxos: async (): Promise<UTxO[]> => {
         return utxos ? utxos : await this.utxosAt(paymentCredentialOf(address));
       },
       getUtxosCore: async (): Promise<Core.TransactionUnspentOutputs> => {
         const coreUtxos = C.TransactionUnspentOutputs.new();
-        (utxos
-          ? utxos
-          : await this.utxosAt(paymentCredentialOf(address))
-        ).forEach((utxo) => coreUtxos.add(utxoToCore(utxo)));
+        (utxos ? utxos : await this.utxosAt(paymentCredentialOf(address)))
+          .forEach((utxo) => coreUtxos.add(utxoToCore(utxo)));
         return coreUtxos;
       },
       getDelegation: async (): Promise<Delegation> => {
@@ -471,7 +452,7 @@ export class Lucid {
       addressType?: "Base" | "Enterprise";
       accountIndex?: number;
       password?: string;
-    }
+    },
   ): Lucid {
     const { address, rewardAddress, paymentKey, stakeKey } = walletFromSeed(
       seed,
@@ -480,7 +461,7 @@ export class Lucid {
         accountIndex: options?.accountIndex || 0,
         password: options?.password,
         network: this.network,
-      }
+      },
     );
 
     const paymentKeyHash = C.PrivateKey.from_bech32(paymentKey)
@@ -502,9 +483,6 @@ export class Lucid {
       // deno-lint-ignore require-await
       rewardAddress: async (): Promise<RewardAddress | null> =>
         rewardAddress || null,
-      getCollateralCore: (): Core.TransactionUnspentOutputs | undefined => {
-        return undefined;
-      },
       // deno-lint-ignore require-await
       getUtxos: async (): Promise<UTxO[]> =>
         this.utxosAt(paymentCredentialOf(address)),
@@ -523,7 +501,7 @@ export class Lucid {
           : { poolId: null, rewards: 0n };
       },
       signTx: async (
-        tx: Core.Transaction
+        tx: Core.Transaction,
       ): Promise<Core.TransactionWitnessSet> => {
         const utxos = await this.utxosAt(address);
 
@@ -532,14 +510,14 @@ export class Lucid {
         const usedKeyHashes = discoverOwnUsedTxKeyHashes(
           tx,
           ownKeyHashes,
-          utxos
+          utxos,
         );
 
         const txWitnessSetBuilder = C.TransactionWitnessSetBuilder.new();
         usedKeyHashes.forEach((keyHash) => {
           const witness = C.make_vkey_witness(
             C.hash_transaction(tx.body()),
-            C.PrivateKey.from_bech32(privKeyHashMap[keyHash]!)
+            C.PrivateKey.from_bech32(privKeyHashMap[keyHash]!),
           );
           txWitnessSetBuilder.add_vkey(witness);
         });
@@ -548,7 +526,7 @@ export class Lucid {
       // deno-lint-ignore require-await
       signMessage: async (
         address: Address | RewardAddress,
-        payload: Payload
+        payload: Payload,
       ): Promise<SignedMessage> => {
         const {
           paymentCredential,

@@ -3,7 +3,6 @@ import {
   Address,
   Assets,
   CertificateValidator,
-  Configuration,
   Datum,
   Json,
   Label,
@@ -23,13 +22,11 @@ import {
 } from "../types/mod.ts";
 import {
   assetsToValue,
-  chunk,
   fromHex,
   networkToId,
   toHex,
   toScriptRef,
   utxoToCore,
-  valueToAssets,
 } from "../utils/mod.ts";
 import { applyDoubleCborEncoding } from "../utils/utils.ts";
 import { Lucid } from "./lucid.ts";
