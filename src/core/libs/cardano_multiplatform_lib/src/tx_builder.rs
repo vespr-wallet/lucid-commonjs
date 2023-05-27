@@ -963,6 +963,17 @@ impl TransactionBuilder {
             self.add_input(&input, None);
         }
 
+        // We need at least one input in the transaction
+        if self.inputs.len() <= 0 {
+            let utxo = match available_inputs.get(0) {
+                Some(utxo) => utxo,
+                None => return Err(JsError::from_str(
+                    "No UTxO found. At least one UTxO is required to make the transaction valid.",
+                )),
+            };
+            self.add_input(&utxo, None);
+        }
+
         Ok(())
     }
 
@@ -1959,6 +1970,12 @@ impl TransactionBuilder {
 
                 /* We set change_total.coin here as amount to make sure we can don't exceed the max val size by a few bytes */
                 let mut change_output = TransactionOutput {
+                    format: if datum.is_some() && datum.as_ref().unwrap().kind() == DatumKind::Data
+                    {
+                        1
+                    } else {
+                        0
+                    },
                     address: change_address.clone(),
                     amount: Value::new(&change_total.coin).clone(),
                     datum: datum.clone(),
@@ -2439,20 +2456,20 @@ impl TransactionBuilder {
                 && collateral_return.amount.coin >= new_total_col
                 && collateral_return.amount.multiasset.is_none()
             {
-                self.total_collateral = Some(collateral_return.amount.coin.clone());
+                new_total_col = collateral_return.amount.coin.clone();
+                self.total_collateral = Some(new_total_col);
                 self.collateral_return = None;
-                return Ok(collateral_return.amount.coin);
+            } else {
+                if collateral_return.amount.coin
+                    < min_ada_required(&collateral_return, &self.config.coins_per_utxo_byte)?
+                {
+                    return Err(JsError::from_str("Not enough ADA leftover to cover fees"));
+                }
+
+                self.total_collateral = Some(new_total_col.clone());
+
+                self.collateral_return = Some(collateral_return.clone());
             }
-
-            if collateral_return.amount.coin
-                < min_ada_required(&collateral_return, &self.config.coins_per_utxo_byte)?
-            {
-                return Err(JsError::from_str("Not enough ADA leftover to cover fees"));
-            }
-
-            self.total_collateral = Some(new_total_col.clone());
-
-            self.collateral_return = Some(collateral_return.clone());
 
             old_total_col = new_total_col.clone();
             new_total_col = self

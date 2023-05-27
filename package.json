@@ -1,6 +1,6 @@
 {
   "name": "@vespr-wallet/lucid-cardano",
-  "version": "0.10.3",
+  "version": "0.10.5",
   "license": "MIT",
   "description": "This is a fork of the original Lucid repo compiled into CommonJS, based on jpg-store's lucid fork. For more information check https://github.com/spacebudz/lucid",
   "repository": "https://github.com/vespr-wallet/lucid"

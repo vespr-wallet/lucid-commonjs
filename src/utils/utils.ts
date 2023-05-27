@@ -12,6 +12,7 @@ import {
   Credential,
   Datum,
   DatumHash,
+  Exact,
   KeyHash,
   MintingPolicy,
   NativeScript,
@@ -39,7 +40,6 @@ import {
   unixTimeToEnclosingSlot,
 } from "../plutus/time.ts";
 import { Data } from "../plutus/data.ts";
-import { TSchema } from "https://deno.land/x/typebox@0.25.13/src/typebox.ts";
 
 export class Utils {
   private lucid: Lucid;
@@ -687,10 +687,10 @@ export function nativeScriptFromJson(nativeScript: NativeScript): Script {
 
 export function applyParamsToScript<T extends unknown[] = Data[]>(
   plutusScript: string,
-  params: [...T],
-  shape?: TSchema
+  params: Exact<[...T]>,
+  type?: T,
 ): string {
-  const p = (shape ? Data.castTo<T>(params, shape) : params) as Data[];
+  const p = (type ? Data.castTo<T>(params, type) : params) as Data[];
   return toHex(
     C.apply_params_to_plutus_script(
       C.PlutusList.from_bytes(fromHex(Data.to<Data[]>(p))),
@@ -723,4 +723,15 @@ export function applyDoubleCborEncoding(script: string): string {
   } catch (_e) {
     return toHex(C.PlutusScript.new(fromHex(script)).to_bytes());
   }
+}
+
+export function addAssets(...assets: Assets[]): Assets {
+  return assets.reduce((a, b) => {
+    for (const k in b) {
+      if (Object.hasOwn(b, k)) {
+        a[k] = (a[k] || 0n) + b[k];
+      }
+    }
+    return a;
+  }, {});
 }
