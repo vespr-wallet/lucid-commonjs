@@ -1,3 +1,11 @@
+# This FORK is very outdated and SHOULD NOT BE USED.
+
+Instead, have a look at [Lucid Evolution](https://github.com/no-witness-labs/lucid-evolution) which is modern and up-to-date library
+
+----
+
+## Previous README below
+
 <p align="center">
   <img width="100px" src="./logo/lucid.svg" align="center"/>
   <h1 align="center">Lucid</h1>
